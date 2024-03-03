@@ -1,8 +1,8 @@
 package event_emitter
 
 import (
-	"io"
 	"log/slog"
+	"os"
 	"testing"
 )
 
@@ -11,7 +11,8 @@ func BenchmarkEmit(b *testing.B) {
 		Message string
 	}
 
-	emitter := NewEventEmitter("benchmark", slog.New(slog.NewTextHandler(io.Discard, nil)))
+	//or slog.New(slog.NewTextHandler(io.Discard, nil))
+	emitter := NewEventEmitter("benchmark", nil)
 
 	// Subscribe to the event
 	Subscribe(func(event ExampleEvent) {}, emitter)
@@ -53,6 +54,15 @@ func TestNewEventEmitter(t *testing.T) {
 
 	if emitter.logger == nil {
 		t.Errorf("New event emitter should have a logger")
+	}
+
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: &slog.LevelVar{},
+	})).With("service", "event-emitter")
+
+	emitter = NewEventEmitter("test", logger)
+	if emitter.logger != logger {
+		t.Errorf("New event emitter should have specific logger")
 	}
 }
 
@@ -123,6 +133,13 @@ func TestSubscribeAndEmitStandardCases(t *testing.T) {
 			name:                  "Event not received with different emitters",
 			emitterSubscribe:      Emitter,
 			emitterEmit:           NewEventEmitter("different"),
+			event:                 "test message",
+			expectedEventReceived: false,
+		},
+		{
+			name:                  "Classic case with nil logger different emitters",
+			emitterSubscribe:      Emitter,
+			emitterEmit:           NewEventEmitter("different", nil),
 			event:                 "test message",
 			expectedEventReceived: false,
 		},

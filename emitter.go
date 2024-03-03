@@ -53,7 +53,10 @@ func Subscribe[T any](subscriber func(event T), optionalEmitter ...*EventEmitter
 	eventType := reflect.TypeOf((*T)(nil)).Elem()
 
 	emitter := getEmitter(optionalEmitter...)
-	emitter.logger.Debug("subscribe", "event", eventType.Name())
+
+	if emitter.logger != nil {
+		emitter.logger.Debug("subscribe", "event", eventType.Name())
+	}
 
 	emitter.mutex.Lock()
 	defer emitter.mutex.Unlock()
@@ -72,7 +75,9 @@ func Unsubscribe[T any](event T, optionalEmitter ...*EventEmitter) {
 	eventType := reflect.TypeOf((*T)(nil)).Elem()
 
 	emitter := getEmitter(optionalEmitter...)
-	emitter.logger.Debug("unsubscribe", "event", eventType.Name())
+	if emitter.logger != nil {
+		emitter.logger.Debug("unsubscribe", "event", eventType.Name())
+	}
 
 	emitter.mutex.Lock()
 	defer emitter.mutex.Unlock()
@@ -97,7 +102,9 @@ func Emit(event interface{}, optionalEmitterParam ...*EventEmitter) {
 	emitter.mutex.RLock()
 	defer emitter.mutex.RUnlock()
 
-	emitter.logger.Debug("emit", "event", eventType.Name(), "subscribers", len(emitter.subscribers[eventType]))
+	if emitter.logger != nil {
+		emitter.logger.Debug("emit", "event", eventType.Name(), "subscribers", len(emitter.subscribers[eventType]))
+	}
 
 	if subscribers, ok := emitter.subscribers[eventType]; ok {
 		for _, subscriber := range subscribers {

@@ -82,6 +82,10 @@ type ExampleEvent struct {
 ### Custom slog logger
 
 ```go
+
+//slog.New(slog.NewTextHandler(io.Discard, nil))
+//json handler
+//nil
 emitter := event_emitter.NewEventEmitter("local", slog.Logger{})
 ```
 
