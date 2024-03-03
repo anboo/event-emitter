@@ -1,6 +1,6 @@
 # Event Emitter
 
-`event_emitter` is a Go package that provides a simple event emitter implementation.
+`event_emitter` is a Go package that provides a simple zero-dependency event emitter implementation.
 
 ## Installation
 
