@@ -12,88 +12,70 @@ go get github.com/anboo/event-emitter
 
 ## Usage
 
-### Basic Usage
+### Basic Usage global emitter
 
 ```go
 package main
 
 import (
 	"fmt"
+
 	"github.com/anboo/event-emitter"
 )
 
 func main() {
-	// Create a new event emitter
-	emitter := event_emitter.NewEventEmitter()
-
-	// Subscribe to an event
-	event_emitter.Subscribe(func(event string) {
-		fmt.Println("Received event:", event)
+	event_emitter.Subscribe(func(event ExampleEvent) {
+		fmt.Println("Received event:", event.Message)
 	})
 
-	// Emit an event
-	emitter.Emit("Hello, world!")
+	event_emitter.Subscribe(func(event AnotherEvent) {
+		fmt.Println("Received another event:", event.Data)
+	})
+
+	event1 := ExampleEvent{"Hello, world!"}
+	event_emitter.Emit(event1)
+
+	event2 := AnotherEvent{42}
+	event_emitter.Emit(event2)
+
+	event_emitter.Unsubscribe(AnotherEvent{})
+
+	event_emitter.Emit(event2)
 }
-```
 
-### Using Custom Event Types
-
-```go
-package main
-
-import (
-	"fmt"
-	"github.com/anboo/event-emitter"
-)
-
-// CustomEvent is a custom event type
-type CustomEvent struct {
+type ExampleEvent struct {
 	Message string
 }
 
-func main() {
-	// Create a new event emitter
-	emitter := event_emitter.NewEventEmitter()
-
-	// Subscribe to an event with a custom type
-	event_emitter.Subscribe(func(event CustomEvent) {
-		fmt.Println("Received custom event:", event.Message)
-	})
-
-	// Emit an event with a custom type
-	customEvent := CustomEvent{"Hello, custom world!"}
-	emitter.Emit(customEvent)
+type AnotherEvent struct {
+	Data int
 }
 ```
 
-### Unsubscribing from Events
-
+### Local emitter
 ```go
 package main
 
 import (
 	"fmt"
+
 	"github.com/anboo/event-emitter"
 )
 
 func main() {
-	// Create a new event emitter
 	emitter := event_emitter.NewEventEmitter()
 
-	// Subscribe to an event
-	subscription := func(event string) {
-		fmt.Println("Received event:", event)
-	}
-	event_emitter.Subscribe(subscription)
+	// Подписываемся на событие типа ExampleEvent.
+	event_emitter.Subscribe(func(event ExampleEvent) {
+		fmt.Println("Received event:", event.Message)
+	}, emitter)
 
-	// Emit an event
-	emitter.Emit("Hello, world!")
+	event_emitter.Emit(ExampleEvent{"Hello, world!"}, emitter)
+}
 
-	// Unsubscribe from the event
-	event_emitter.Unsubscribe(subscription)
-
-	// Emit the event again
-	emitter.Emit("Hello again, world!") // This should not trigger any subscriber
+// ExampleEvent - пример структуры события.
+type ExampleEvent struct {
+	Message string
 }
 ```
 
