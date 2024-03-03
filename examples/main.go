@@ -7,6 +7,8 @@ import (
 )
 
 func main() {
+	event_emitter.Emitter.Debug()
+
 	event_emitter.Subscribe(func(event ExampleEvent) {
 		fmt.Println("Received event:", event.Message)
 	})

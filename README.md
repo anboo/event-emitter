@@ -63,7 +63,7 @@ import (
 )
 
 func main() {
-	emitter := event_emitter.NewEventEmitter()
+	emitter := event_emitter.NewEventEmitter("local")
 
 	// Подписываемся на событие типа ExampleEvent.
 	event_emitter.Subscribe(func(event ExampleEvent) {
@@ -77,6 +77,20 @@ func main() {
 type ExampleEvent struct {
 	Message string
 }
+```
+
+### Custom slog logger
+
+```go
+emitter := event_emitter.NewEventEmitter("local", slog.Logger{})
+```
+
+### Debug logs
+```go
+event_emitter.Emitter.Debug() //global emitter
+
+emitter := event_emitter.NewEventEmitter("local")
+emitter.Debug() //local emitter
 ```
 
 ## License
